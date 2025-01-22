@@ -18,16 +18,12 @@ def split_and_sort_timestamp(df, timestamp_col):
     # Drop the original Timestamp column
     df = df.drop(columns=[timestamp_col])
 
-    # # Convert Date and Time to sortable formats
-    # df['Date'] = pd.to_datetime(df['Date'])
-    # df['Time'] = pd.to_timedelta(df['Time'])
-
     # Sort by Date and Time
     df = df.sort_values(by=['Date', 'Time']).reset_index(drop=True)
 
     return df
 
-def create_overheight_sheet(temp_file):
+def create_overheight_sheet(temp_file,threshold_right,threshold_left,threshold_horizontal):
     overheight_rows = []
     timestamps = []
 
@@ -230,6 +226,46 @@ def clean_create_analytical_data():
         'Horizontal_Average', 'Horizontal_Max', 'Horizontal_Min'
     ])
     return analytical_df
+
+def create_carrier_data():
+    # Extract the required data for the dashboard
+    dashboard_data = pd.DataFrame({
+        'Carrier Code': analysis_df_1['Carrier Code'],
+        'Left Wheel Average': analysis_df_1['Average Value'],
+        'Left Wheel Range': analysis_df_1['Range'],
+        'Left Wheel Max' : analysis_df_1['Max'],
+        'Left Wheel Min' : analysis_df_1['Min'],
+        'Right Wheel Average': analysis_df_2['Average Value'],
+        'Right Wheel Range': analysis_df_2['Range'],
+        'Right Wheel Max' : analysis_df_2['Max'],
+        'Right Wheel Min' : analysis_df_2['Min'],
+        'Horizontal Average': analysis_df_3['Average Value'],
+        'Horizontal Range': analysis_df_3['Range'],
+        'RHorizontal Wheel Max' : analysis_df_3['Max'],
+        'Horizontal Min' : analysis_df_3['Min'],
+    })
+    return dashboard_data
+
+
+def create_carrier_data_clean():
+    # Extract the required data for the dashboard
+    dashboard_data = pd.DataFrame({
+        'Carrier Code': clean_analysis_df_1['Carrier Code'],
+        'Left Wheel Average': clean_analysis_df_1['Average Value'],
+        'Left Wheel Range': clean_analysis_df_1['Range'],
+        'Left Wheel Max' : clean_analysis_df_1['Max'],
+        'Left Wheel Min' : clean_analysis_df_1['Min'],
+        'Right Wheel Average': clean_analysis_df_2['Average Value'],
+        'Right Wheel Range': clean_analysis_df_2['Range'],
+        'Right Wheel Max' : clean_analysis_df_2['Max'],
+        'Right Wheel Min' : clean_analysis_df_2['Min'],
+        'Horizontal Average': clean_analysis_df_3['Average Value'],
+        'Horizontal Range': clean_analysis_df_3['Range'],
+        'RHorizontal Wheel Max' : clean_analysis_df_3['Max'],
+        'Horizontal Min' : clean_analysis_df_3['Min'],
+    })
+    return dashboard_data
+
                        
 def create_dashboard():
     # Extract the required data for the dashboard
@@ -237,10 +273,16 @@ def create_dashboard():
         'Carrier Code': analysis_df_1['Carrier Code'],
         'Left Wheel Average': analysis_df_1['Average Value'],
         'Left Wheel Range': analysis_df_1['Range'],
+        'Left Wheel Max' : analysis_df_1['Max'],
+        'Left Wheel Min' : analysis_df_1['Min'],
         'Right Wheel Average': analysis_df_2['Average Value'],
         'Right Wheel Range': analysis_df_2['Range'],
+        'Right Wheel Max' : analysis_df_2['Max'],
+        'Right Wheel Min' : analysis_df_2['Min'],
         'Horizontal Average': analysis_df_3['Average Value'],
-        'Horizontal Range': analysis_df_3['Range']
+        'Horizontal Range': analysis_df_3['Range'],
+        'RHorizontal Wheel Max' : analysis_df_3['Max'],
+        'Horizontal Min' : analysis_df_3['Min'],
     })
     return dashboard_data
 
@@ -250,10 +292,16 @@ def clean_create_dashboard():
         'Carrier Code': clean_analysis_df_1['Carrier Code'],
         'Left Wheel Average': clean_analysis_df_1['Average Value'],
         'Left Wheel Range': clean_analysis_df_1['Range'],
+        'Left Wheel Max' : clean_analysis_df_1['Max'],
+        'Left Wheel Min' : clean_analysis_df_1['Min'],
         'Right Wheel Average': clean_analysis_df_2['Average Value'],
         'Right Wheel Range': clean_analysis_df_2['Range'],
+        'Right Wheel Max' : clean_analysis_df_2['Max'],
+        'Right Wheel Min' : clean_analysis_df_2['Min'],
         'Horizontal Average': clean_analysis_df_3['Average Value'],
-        'Horizontal Range': clean_analysis_df_3['Range']
+        'Horizontal Range': clean_analysis_df_3['Range'],
+        'RHorizontal Wheel Max' : clean_analysis_df_3['Max'],
+        'Horizontal Min' : clean_analysis_df_3['Min'],
     })
     return dashboard_data
 # Load your logo image
@@ -305,7 +353,7 @@ if st.button('Process Data'):
                     df = df[df['Carrier'] <= 667]
                     df = df[df['Carrier'] != 0]
                     unique_carriers = df['Carrier'].unique()
-                    summarys_df, overheight_measurements = create_overheight_sheet(temp_file_path)
+                    summarys_df, overheight_measurements = create_overheight_sheet(temp_file_path,threshold_right,threshold_left,threshold_horizontal)
                     errors_df= create_error_carriers_sheet(temp_file_path)
                     
                     # Create result DataFrames for each measurement column and save them as separate sheets
@@ -362,17 +410,18 @@ if st.button('Process Data'):
                             # st.write(summarys_df)
                             st.subheader('Errors Dataset')
                             st.dataframe(errors_df,height=400)
-                            st.subheader('Carrier Data')
-                            st.write(graph_data)
-                            st.subheader('Cleaned Carrier Data')
-                            st.dataframe(clean_graph_data)
+
                         
                         with col2:
                             st.subheader('Overheight measurments')
                             st.write(overheight_measurements)
-                            st.subheader('Valid Dataset')
-                            st.dataframe(df)
-                            
+                            # st.subheader('Valid Dataset')
+                            # st.dataframe(df)
+    
+                        st.subheader('Carrier Data')
+                        st.write(graph_data)
+                        st.subheader('Cleaned Carrier Data')
+                        st.dataframe(clean_graph_data)   
                     
                         
                     # Display views in each tab
