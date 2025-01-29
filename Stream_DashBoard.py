@@ -40,6 +40,8 @@ def create_overheight_sheet(temp_file,threshold_right,threshold_left,threshold_h
                 continue
 
             parts = line.strip().split(';')
+            if len(parts) < 6:  # Make sure the line has at least 4 elements
+                continue
             carrier = int(parts[3].split('.')[0])  # Extract carrier
             Left_Wheel_Measurements = float(parts[4]) if parts[4] else 0
             Right_Wheel_Measurements = float(parts[5]) if parts[5] else 0
@@ -90,6 +92,8 @@ def create_error_carriers_sheet(temp_file_path):
                 continue
 
             parts = line.strip().split(';')
+            if len(parts) < 6:  # Make sure the line has at least 4 elements
+                continue
             carrier = int(parts[3].split('.')[0])  # Extract carrier
             Left_Wheel_Measurements = float(parts[4]) if parts[4] else 0
             Right_Wheel_Measurements = float(parts[5]) if parts[5] else 0
@@ -246,7 +250,6 @@ def create_carrier_data():
     })
     return dashboard_data
 
-
 def create_carrier_data_clean():
     # Extract the required data for the dashboard
     dashboard_data = pd.DataFrame({
@@ -265,8 +268,7 @@ def create_carrier_data_clean():
         'Horizontal Min' : clean_analysis_df_3['Min'],
     })
     return dashboard_data
-
-                       
+                      
 def create_dashboard():
     # Extract the required data for the dashboard
     dashboard_data = pd.DataFrame({
